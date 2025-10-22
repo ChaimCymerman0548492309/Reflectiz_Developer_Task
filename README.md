@@ -3,6 +3,18 @@
 A Node.js + TypeScript REST API for domain intelligence analysis.  
 The system queries **VirusTotal** and **Whois**, stores results in **PostgreSQL**, and refreshes results automatically with a **scheduler**.
 
+## 🚀 Live Deployment
+**The API is currently running live at:**  
+**https://reflectiz-developer-task.onrender.com**
+
+You can test all endpoints directly against the live deployment without local setup.
+
+## Quick Start
+No setup required! Use the live endpoint immediately:
+```bash
+curl "https://reflectiz-developer-task.onrender.com/get?domain=google.com"
+```
+
 ## Project Structure
 ```
 intelligenter/
@@ -52,22 +64,19 @@ intelligenter/
 | status | String | Request result |
 | createdAt | DateTime | Log time |
 
-## Installation & Setup
+## Installation & Setup (Local)
 
 ```bash
 # Clone repository
-git clone https://github.com/<your-repo>/intelligenter.git
-cd intelligenter
+git clone https://github.com/ChaimCymerman0548492309/Reflectiz_Developer_Task
+cd Reflectiz_Developer_Task
 
 # Install dependencies
 npm install
 
 # Configure environment
 cp .env.example .env
-# Edit .env with your keys:
-# DATABASE_URL="postgresql://..."
-# VIRUSTOTAL_API_KEY="..."
-# WHOIS_API_KEY="..."
+# Edit .env with your API keys
 
 # Setup database
 npx prisma generate
@@ -77,24 +86,26 @@ npx prisma migrate dev --name init
 npm run dev
 ```
 
-## API Testing
+## API Testing (Live Deployment)
+
+Test directly against the live API:
 
 ```bash
 # Analyze domain
-curl -X POST http://localhost:3000/post \
+curl -X POST https://reflectiz-developer-task.onrender.com/post \
   -H "Content-Type: application/json" \
   -d '{"domain":"google.com"}'
 
 # Get existing results
-curl "http://localhost:3000/get?domain=google.com"
+curl "https://reflectiz-developer-task.onrender.com/get?domain=google.com"
 
 # Test malicious domain
-curl -X POST http://localhost:3000/post \
+curl -X POST https://reflectiz-developer-task.onrender.com/post \
   -H "Content-Type: application/json" \
   -d '{"domain":"malware.wicar.org"}'
 
 # Invalid domain
-curl -X POST http://localhost:3000/post \
+curl -X POST https://reflectiz-developer-task.onrender.com/post \
   -H "Content-Type: application/json" \
   -d '{"domain":"not@valid"}'
 ```
@@ -132,17 +143,12 @@ curl -X POST http://localhost:3000/post \
 
 ## Features
 
-- **Automatic Scheduling**: Daily cron job at 03:00 to re-scan domains older than 30 days
+- **Live Deployment**: Fully functional API available at the provided URL
+- **Automatic Scheduling**: Daily cron job to re-scan domains older than 30 days
 - **Request Logging**: All GET/POST requests stored in database
 - **Caching**: Results stored in PostgreSQL to avoid API rate limits
 - **Validation**: Domain format validation before processing
 
-## Deployment
-
-The app is configured for Render deployment with:
-- Automatic builds on git push
-- PostgreSQL database integration
-- Environment variable configuration
 
 **Tech Stack**: TypeScript, Express, Prisma, PostgreSQL, Node-Cron
 
