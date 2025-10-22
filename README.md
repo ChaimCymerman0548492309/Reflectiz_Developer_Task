@@ -35,7 +35,7 @@ intelligenter/
 
 
 ## 🧩 System Architecture
-<img src="./dag.png" width="600" alt="System Architecture Diagram">
+![System Diagram](./dag.png)
 
 
 ---
