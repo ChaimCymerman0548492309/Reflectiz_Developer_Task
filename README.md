@@ -35,7 +35,7 @@ intelligenter/
 
 
 ## 🧩 System Architecture
-<img src="./dag.png" width="600" alt="System Architecture Diagram">
+<img width="883" height="502" alt="image" src="https://github.com/user-attachments/assets/b2871812-71b9-4be9-94a7-ba574aa86323" />
 
 
 ---
