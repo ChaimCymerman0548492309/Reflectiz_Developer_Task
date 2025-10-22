@@ -1,0 +1,17 @@
+# Node
+node_modules/
+dist/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Prisma
+prisma/dev.db
+prisma/*.sqlite
+
+# TypeScript
+*.tsbuildinfo
+
+# OS
+.DS_Store
+Thumbs.db
