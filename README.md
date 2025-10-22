@@ -1,174 +1,218 @@
 ```markdown
-# 🧠 Intelligenter
+# 🧠 Intelligenter – Reflectiz Developer Task
 
-Intelligenter is a Node.js + TypeScript backend that analyzes domains using **VirusTotal** and **WHOIS** APIs, storing results in a **PostgreSQL** database via **Prisma ORM**.  
-It provides two main API endpoints for analysis and retrieval.
+A Node.js + TypeScript REST API for domain intelligence analysis.  
+The system queries **VirusTotal** and **Whois**, stores results in a **PostgreSQL (Neon)** database, and refreshes results automatically with a **scheduler (cron job)**.
 
 ---
 
 ## 📁 Project Structure
+
 ```
 
 intelligenter/
-├── prisma/
-│ └── schema.prisma # Prisma schema (database models)
 ├── src/
-│ ├── index.ts # Express app entry point
-│ ├── routes.ts # API routes
-│ ├── scheduler.ts # Cron-based automatic rescanning
-│ ├── queue.ts # (optional) background queue logic
-│ ├── services/
-│ │ ├── analyzer.ts # Main analysis logic
-│ │ ├── virusTotal.ts # VirusTotal integration
-│ │ ├── whois.ts # WHOIS integration
-│ │ └── db.ts # Prisma client
-│ ├── util/
-│ │ └── validate.ts # Domain validation
-│ └── types.ts # Shared types
-├── .env # Environment variables
+│   ├── index.ts              # Express server entry
+│   ├── router.ts             # REST routes (GET / POST)
+│   ├── services/
+│   │   ├── analyzer.ts       # Main analysis logic
+│   │   ├── virusTotal.ts     # VirusTotal integration
+│   │   └── whois.ts          # Whois integration
+│   ├── scheduler.ts          # Monthly re-analysis cron
+│   ├── db.ts                 # Prisma client
+│   └── util/
+│       └── validate.ts       # Domain validation
+├── prisma/
+│   ├── schema.prisma         # DB schema
+│   └── migrations/           # Prisma migrations
+├── docker-compose.yml        # Optional local DB setup
+├── render.yaml               # Deployment config
 ├── package.json
 ├── tsconfig.json
-├── docker-compose.yml
-└── README.md
+├── README.md
+└── dag.png                   # System architecture diagram
 
 ````
 
 ---
 
-## 🧩 Data Flow
+## 🧩 System Architecture
 
-1. User sends `/post` or `/get` request with a domain.
-2. The API validates the domain.
-3. If domain data is missing or outdated:
-   - `analyzer.ts` runs `getVirusTotal()` and `getWhois()`.
-   - Results are stored in the database.
-4. The `/get` endpoint returns either:
-   - `"OnAnalysis"` if still processing.
-   - Or full results (VT + WHOIS) once ready.
-5. A daily cron job rescans old domains automatically.
+![System Diagram](./dag.png)
 
 ---
 
-## 🗄️ Prisma Schema
+## 🧱 Database Schema
 
-```prisma
-model Domain {
-  id            String   @id @default(cuid())
-  name          String   @unique
-  status        String
-  lastScannedAt DateTime?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  vtDetections  Int?
-  vtEngines     Int?
-  whoisOwner    String?
-  whoisCreated  DateTime?
-  whoisExpire   DateTime?
-}
-````
+### `Domain` Table
+| Field | Type | Description |
+|-------|------|-------------|
+| id | String (UUID) | Primary key |
+| name | String | Domain name |
+| status | String | READY / OnAnalysis / ERROR |
+| lastScannedAt | DateTime | Last scan date |
+| vtDetections | Int | Number of detections |
+| vtEngines | Int | Number of engines scanned |
+| whoisOwner | String | Domain owner |
+| whoisCreated | DateTime | Creation date |
+| whoisExpire | DateTime | Expiration date |
+
+### `RequestLog` Table
+| Field | Type | Description |
+|-------|------|-------------|
+| id | String (UUID) | Primary key |
+| domain | String | Requested domain |
+| method | String | HTTP Method (GET/POST) |
+| status | String | Request result |
+| createdAt | DateTime | Log time |
 
 ---
 
-## ⚙️ Setup & Installation
-
-### 1. Clone the repository
+## ⚙️ Installation & Setup
 
 ```bash
-git clone https://github.com/yourusername/intelligenter.git
+# 1️⃣ Clone the repository
+git clone https://github.com/<your-repo>/intelligenter.git
 cd intelligenter
-```
 
-### 2. Install dependencies
-
-```bash
+# 2️⃣ Install dependencies
 npm install
-```
 
-### 3. Configure environment variables
+# 3️⃣ Configure environment
+cp  .env
+# Edit .env with your own keys:
+# DATABASE_URL="postgresql://..."
+# VIRUSTOTAL_API_KEY="..."
+# WHOIS_API_KEY="..."
+# PORT=3000
 
-Create a `.env` file:
-
-```env
-DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DBNAME?sslmode=require"
-VIRUSTOTAL_API_KEY="your_vt_key"
-WHOIS_API_KEY="your_whois_key"
-PORT=3000
-```
-
-### 4. Initialize Prisma
-
-```bash
+# 4️⃣ Generate Prisma client
 npx prisma generate
+
+# 5️⃣ Run initial DB migration (creates tables)
 npx prisma migrate dev --name init
-```
 
-### 5. Run development server
-
-With hot reload:
-
-```bash
+# 6️⃣ Run server (dev mode)
 npm run dev
-```
-
-Without hot reload:
-
-```bash
-npm start
-```
-
-### 6. Build for production
-
-```bash
-npm run build
-npm run start
-```
+````
 
 ---
 
-## 🧪 Test API
-
-### Analyze a domain
+## 🧪 Test Commands
 
 ```bash
-curl -X POST http://localhost:3000/post \
-  -H "Content-Type: application/json" \
-  -d '{"domain":"google.com"}'
-```
+# Normal domain
+curl -X POST http://localhost:3000/post -H "Content-Type: application/json" -d '{"domain":"google.com"}'
 
-### Retrieve results
-
-```bash
+# Existing result
 curl "http://localhost:3000/get?domain=google.com"
+
+# Fake domain (nonexistent)
+curl -X POST http://localhost:3000/post -H "Content-Type: application/json" -d '{"domain":"noexistingsiteevil.biz"}'
+
+# Known malicious domain
+curl -X POST http://localhost:3000/post -H "Content-Type: application/json" -d '{"domain":"malware.wicar.org"}'
+
+# Invalid domain
+curl -X POST http://localhost:3000/post -H "Content-Type: application/json" -d '{"domain":"not@valid"}'
+
+# Existing malicious result
+curl "http://localhost:3000/get?domain=malware.wicar.org"
 ```
 
 ---
 
-## 🐳 Docker (optional)
+## 🔍 Expected Responses
 
-Build and run containers:
+### ✅ Clean Domain
 
-```bash
-docker-compose up --build
+```json
+{
+  "domain": "google.com",
+  "VTData": { "detections": 0, "engines": 95 },
+  "WhoisData": {
+    "owner": "google llc",
+    "created": "1997-09-15T07:00:00.000Z",
+    "expire": "2028-09-14T04:00:00.000Z"
+  },
+  "lastUpdated": "2025-10-22T16:01:55.630Z"
+}
+```
+
+### ⚠️ Malicious Domain
+
+```json
+{
+  "domain": "malware.wicar.org",
+  "VTData": {
+    "detections": 15,
+    "engines": 95
+  },
+  "WhoisData": {
+    "owner": null,
+    "created": null,
+    "expire": null
+  },
+  "lastUpdated": "2025-10-22T16:01:58.547Z"
+}
+```
+
+### ❌ Invalid Domain
+
+```json
+{"error": "invalid domain"}
 ```
 
 ---
 
 ## 🕒 Scheduler
 
-`node-cron` runs every day at 03:00 to re-analyze old or unscanned domains.
+A cron job runs daily at 03:00 to re-scan any domains not updated in 30 days:
+
+```ts
+cron.schedule("0 3 * * *", ...)
+```
 
 ---
 
-## ✅ Summary
+## 🧾 Logs
 
-- **Language:** TypeScript
-- **Framework:** Express.js
-- **ORM:** Prisma
-- **Database:** PostgreSQL
-- **External APIs:** VirusTotal, WHOIS (API Ninjas)
-- **Automation:** Cron-based daily refresh
-- **Deployment:** Docker or Node.js standalone
+Every request (GET / POST) is stored in the `RequestLog` table:
 
+| Domain     | Method | Status     | CreatedAt            |
+| ---------- | ------ | ---------- | -------------------- |
+| google.com | POST   | OnAnalysis | 2025-10-22T16:00:00Z |
+
+---
+
+## 🚀 Deployment (Render)
+
+The app auto-builds with:
+
+```yaml
+# render.yaml
+services:
+  - type: web
+    name: intelligenter
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build && npx prisma generate
+    startCommand: npm start
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: VIRUSTOTAL_API_KEY
+        sync: false
+      - key: WHOIS_API_KEY
+        sync: false
 ```
 
+---
+
+**Author:** Chaim Cymerman
+**Language:** TypeScript
+**Frameworks:** Express, Prisma, Node-Cron
+**Database:** PostgreSQL (Neon)
+
+```
 ```
