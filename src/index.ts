@@ -2,7 +2,7 @@ import "dotenv/config";
 import express from "express";
 import helmet from "helmet";
 import cors from "cors";
-import { router } from "./routes";
+import { router } from "./router";
 import { initScheduler } from "./scheduler";
 
 const app = express();
