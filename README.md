@@ -35,9 +35,8 @@ intelligenter/
 
 
 ## 🧩 System Architecture
-<p align="center">
-  <img src="./dag.png" width="600" alt="System Architecture Diagram">
-</p>
+<img src="./dag.png" width="600" alt="System Architecture Diagram">
+
 
 ---
 
