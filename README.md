@@ -7,38 +7,37 @@ The system queries **VirusTotal** and **Whois**, stores results in a **PostgreSQ
 ---
 
 ## 📁 Project Structure
-
-```
-
+```text
 intelligenter/
 ├── src/
-│   ├── index.ts              # Express server entry
-│   ├── router.ts             # REST routes (GET / POST)
+│   ├── index.ts           # Express server entry
+│   ├── router.ts          # REST routes (GET / POST)
 │   ├── services/
-│   │   ├── analyzer.ts       # Main analysis logic
-│   │   ├── virusTotal.ts     # VirusTotal integration
-│   │   └── whois.ts          # Whois integration
-│   ├── scheduler.ts          # Monthly re-analysis cron
-│   ├── db.ts                 # Prisma client
+│   │   ├── analyzer.ts    # Main analysis logic
+│   │   ├── virusTotal.ts  # VirusTotal integration
+│   │   └── whois.ts       # Whois integration
+│   ├── scheduler.ts       # Monthly re-analysis cron
+│   ├── db.ts              # Prisma client
 │   └── util/
-│       └── validate.ts       # Domain validation
+│       └── validate.ts    # Domain validation
 ├── prisma/
-│   ├── schema.prisma         # DB schema
-│   └── migrations/           # Prisma migrations
-├── docker-compose.yml        # Optional local DB setup
-├── render.yaml               # Deployment config
+│   ├── schema.prisma      # DB schema
+│   └── migrations/        # Prisma migrations
+├── docker-compose.yml     # Optional local DB setup
+├── render.yaml            # Deployment config
 ├── package.json
 ├── tsconfig.json
 ├── README.md
-└── dag.png                   # System architecture diagram
+└── dag.png                # System architecture diagram
 
-````
 
 ---
 
-## 🧩 System Architecture
 
-![System Diagram](./dag.png)
+## 🧩 System Architecture
+<p align="center">
+  <img src="./dag.png" width="600" alt="System Architecture Diagram">
+</p>
 
 ---
 
