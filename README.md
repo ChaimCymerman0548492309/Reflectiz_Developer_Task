@@ -6,13 +6,23 @@ The system queries **VirusTotal** and **Whois**, stores results in **PostgreSQL*
 ## 🚀 Live Deployment
 **The API is currently running live at:**  
 **https://reflectiz-developer-task.onrender.com**
+כך תוכל לעדכן את הקטע בצורה טבעית וברורה:
 
-You can test all endpoints directly against the live deployment without local setup.
+````markdown
+You can test all endpoints directly against the live deployment without any local setup.
 
-## Quick Start
-No setup required! Use the live endpoint immediately:
+## ⚡ Quick Start
+No setup required! You can use the live endpoint immediately:
+
 ```bash
 curl "https://reflectiz-developer-task.onrender.com/get?domain=google.com"
+````
+
+> ⚠️ **Note:**
+> The service runs on a free Render instance, so responses may take a few seconds to return when the server wakes up.
+> In addition, you might occasionally receive HTTP `400` or `429` errors — this happens when the free VirusTotal or Whois API keys reach their rate limit or fail to respond for certain domains (e.g., restricted TLDs like `.io`).
+
+```
 ```
 
 ## Project Structure
