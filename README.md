@@ -7,16 +7,16 @@ The system queries **VirusTotal** and **Whois**, stores results in **PostgreSQL*
 **The API is currently running live at:**  
 **https://reflectiz-developer-task.onrender.com**
 
-````markdown
 You can test all endpoints directly against the live deployment without any local setup.
 
 ## ⚡ Quick Start
 No setup required! You can use the live endpoint immediately:
+````markdown
 
-```bash
-```
+bash
+
 curl "https://reflectiz-developer-task.onrender.com/get?domain=google.com"
-```
+
 ````
 
 > ⚠️ **Note:**
