@@ -11,13 +11,27 @@ You can test all endpoints directly against the live deployment without any loca
 
 ## ⚡ Quick Start
 No setup required! You can use the live endpoint immediately:
-````markdown
+Test directly against the live API:
 
-bash
+```bash
+# Analyze domain
+curl -X POST https://reflectiz-developer-task.onrender.com/post \
+  -H "Content-Type: application/json" \
+  -d '{"domain":"google.com"}'
 
+# Get existing results
 curl "https://reflectiz-developer-task.onrender.com/get?domain=google.com"
 
-````
+# Test malicious domain
+curl -X POST https://reflectiz-developer-task.onrender.com/post \
+  -H "Content-Type: application/json" \
+  -d '{"domain":"malware.wicar.org"}'
+
+# Invalid domain
+curl -X POST https://reflectiz-developer-task.onrender.com/post \
+  -H "Content-Type: application/json" \
+  -d '{"domain":"not@valid"}'
+```
 
 > ⚠️ **Note:**
 > The service runs on a free Render instance, so responses may take a few seconds to return when the server wakes up.
